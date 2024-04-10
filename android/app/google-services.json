@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "682576065738",
+    "project_id": "speak-loud-86udhk",
+    "storage_bucket": "speak-loud-86udhk.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682576065738:android:fdd6f899c8c4d4312cb033",
+        "android_client_info": {
+          "package_name": "com.flutterflow.finwallet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0Ls3yshl01MlBA4JYoolTowOwKeAev7Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682576065738:android:55ba8436b9e5c71c2cb033",
+        "android_client_info": {
+          "package_name": "com.flutterflow.speakaloud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0Ls3yshl01MlBA4JYoolTowOwKeAev7Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

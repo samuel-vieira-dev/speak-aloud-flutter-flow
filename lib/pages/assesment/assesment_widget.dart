@@ -1,16 +1,20 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/backend/custom_cloud_functions/custom_cloud_function_response_manager.dart';
+import '/backend/firebase_storage/storage.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_timer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/upload_data.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/flutter_flow/permissions_util.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -727,7 +731,8 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                                     child: Text(
                                                                       getJsonField(
                                                                         _model
-                                                                            .speechAceResponse,
+                                                                            .speechaceIntermediaryResponse!
+                                                                            .jsonBody,
                                                                         r'''$.detail_message''',
                                                                       ).toString(),
                                                                       style: FlutterFlowTheme.of(
@@ -987,22 +992,97 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
 
                                           _shouldSetState = true;
                                           logFirebaseEvent(
-                                              'stopRecording_custom_action');
-                                          _model.speechAceResponse =
-                                              await actions.speechAceRequest(
-                                            _model.audiorecord!,
-                                            _model.textFieldAssesmentController
-                                                .text,
-                                            currentUserUid,
-                                          );
+                                              'stopRecording_upload_file_to_firebase');
+                                          {
+                                            setState(() =>
+                                                _model.isDataUploading = true);
+                                            var selectedUploadedFiles =
+                                                <FFUploadedFile>[];
+                                            var selectedFiles =
+                                                <SelectedFile>[];
+                                            var downloadUrls = <String>[];
+                                            try {
+                                              selectedUploadedFiles = _model
+                                                      .recordedFileBytes
+                                                      .bytes!
+                                                      .isNotEmpty
+                                                  ? [_model.recordedFileBytes]
+                                                  : <FFUploadedFile>[];
+                                              selectedFiles =
+                                                  selectedFilesFromUploadedFiles(
+                                                selectedUploadedFiles,
+                                              );
+                                              downloadUrls = (await Future.wait(
+                                                selectedFiles.map(
+                                                  (f) async => await uploadData(
+                                                      f.storagePath, f.bytes),
+                                                ),
+                                              ))
+                                                  .where((u) => u != null)
+                                                  .map((u) => u!)
+                                                  .toList();
+                                            } finally {
+                                              _model.isDataUploading = false;
+                                            }
+                                            if (selectedUploadedFiles.length ==
+                                                    selectedFiles.length &&
+                                                downloadUrls.length ==
+                                                    selectedFiles.length) {
+                                              setState(() {
+                                                _model.uploadedLocalFile =
+                                                    selectedUploadedFiles.first;
+                                                _model.uploadedFileUrl =
+                                                    downloadUrls.first;
+                                              });
+                                            } else {
+                                              setState(() {});
+                                              return;
+                                            }
+                                          }
+
+                                          logFirebaseEvent(
+                                              'stopRecording_cloud_function');
+                                          try {
+                                            final result =
+                                                await FirebaseFunctions
+                                                        .instanceFor(
+                                                            region: 'us-west1')
+                                                    .httpsCallable(
+                                                        'speechAceIntermediary')
+                                                    .call({
+                                              "uploadURL":
+                                                  _model.uploadedFileUrl,
+                                              "text": _model
+                                                  .textFieldAssesmentController
+                                                  .text,
+                                              "userId": currentUserUid,
+                                            });
+                                            _model.speechaceIntermediaryResponse =
+                                                SpeechAceIntermediaryCloudFunctionCallResponse(
+                                              data: result.data,
+                                              succeeded: true,
+                                              resultAsString:
+                                                  result.data.toString(),
+                                              jsonBody: result.data,
+                                            );
+                                          } on FirebaseFunctionsException catch (error) {
+                                            _model.speechaceIntermediaryResponse =
+                                                SpeechAceIntermediaryCloudFunctionCallResponse(
+                                              errorCode: error.code,
+                                              succeeded: false,
+                                            );
+                                          }
+
                                           _shouldSetState = true;
                                           logFirebaseEvent(
                                               'stopRecording_custom_action');
                                           _model.isSuccess =
                                               await actions.isAssessmentSuccess(
                                             getJsonField(
-                                              _model.speechAceResponse,
-                                              r'''$.status''',
+                                              _model
+                                                  .speechaceIntermediaryResponse!
+                                                  .jsonBody,
+                                              r'''$.data.status''',
                                             ).toString(),
                                           );
                                           _shouldSetState = true;
@@ -1026,12 +1106,16 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                               'stopRecording_update_page_state');
                                           setState(() {
                                             _model.scoreValue = getJsonField(
-                                              _model.speechAceResponse,
-                                              r'''$.text_score.speechace_score.pronunciation''',
+                                              _model
+                                                  .speechaceIntermediaryResponse
+                                                  ?.jsonBody,
+                                              r'''$.data.text_score.speechace_score.pronunciation''',
                                             );
                                             _model.wordScoreList = getJsonField(
-                                              _model.speechAceResponse,
-                                              r'''$.text_score.word_score_list''',
+                                              _model
+                                                  .speechaceIntermediaryResponse!
+                                                  .jsonBody,
+                                              r'''$.data.text_score.word_score_list''',
                                               true,
                                             )!
                                                 .toList()
@@ -1043,8 +1127,10 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                           _model.scoreText =
                                               await actions.getScoreText(
                                             getJsonField(
-                                              _model.speechAceResponse,
-                                              r'''$.text_score.speechace_score.pronunciation''',
+                                              _model
+                                                  .speechaceIntermediaryResponse!
+                                                  .jsonBody,
+                                              r'''$.data.text_score.speechace_score.pronunciation''',
                                             ),
                                           );
                                           _shouldSetState = true;
@@ -1053,8 +1139,10 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                           _model.scoreTitle =
                                               await actions.getScoreTitle(
                                             getJsonField(
-                                              _model.speechAceResponse,
-                                              r'''$.text_score.speechace_score.pronunciation''',
+                                              _model
+                                                  .speechaceIntermediaryResponse!
+                                                  .jsonBody,
+                                              r'''$.data.text_score.speechace_score.pronunciation''',
                                             ),
                                           );
                                           _shouldSetState = true;

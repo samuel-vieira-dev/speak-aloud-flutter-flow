@@ -11,5 +11,6 @@ import 'package:flutter/material.dart';
 // Set your action name, define your arguments and return parameter,
 // and then add the boilerplate code using the green button on the right!
 bool isAssessmentSuccess(String status) {
+  print(status);
   return status != 'error';
 }

@@ -1,17 +1,21 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/backend/custom_cloud_functions/custom_cloud_function_response_manager.dart';
+import '/backend/firebase_storage/storage.dart';
 import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_timer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/upload_data.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/flutter_flow/permissions_util.dart';
 import 'assesment_widget.dart' show AssesmentWidget;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -73,8 +77,13 @@ class AssesmentModel extends FlutterFlowModel<AssesmentWidget> {
   String? audiorecord;
   FFUploadedFile recordedFileBytes =
       FFUploadedFile(bytes: Uint8List.fromList([]));
-  // Stores action output result for [Custom Action - speechAceRequest] action in stopRecording widget.
-  dynamic? speechAceResponse;
+  bool isDataUploading = false;
+  FFUploadedFile uploadedLocalFile =
+      FFUploadedFile(bytes: Uint8List.fromList([]));
+  String uploadedFileUrl = '';
+
+  // Stores action output result for [Cloud Function - speechAceIntermediary] action in stopRecording widget.
+  SpeechAceIntermediaryCloudFunctionCallResponse? speechaceIntermediaryResponse;
   // Stores action output result for [Custom Action - isAssessmentSuccess] action in stopRecording widget.
   bool? isSuccess;
   // Stores action output result for [Custom Action - getScoreText] action in stopRecording widget.

@@ -17,16 +17,22 @@ Future<dynamic> speechAceRequest(
     String audioUrl, String text, String userId) async {
   try {
     // Lê o arquivo de áudio como bytes
+    print('AUDIO URL');
+    print(audioUrl);
     File audioFile = File(audioUrl);
+    print('AUDIO FILE');
+    print(audioFile);
     var audioBytes = await audioFile.readAsBytes();
-
+    print('AUDIO BYTES');
+    print(audioBytes);
     // Cria um MultipartFile a partir dos bytes do arquivo
     var multipartFile = MultipartFile.fromBytes(
       'user_audio_file',
       audioBytes,
       filename: 'audio.mp3', // Nome do arquivo
     );
-
+    print('MULTIPARTFILE');
+    print(multipartFile);
     // Cria o FormData e anexa o MultipartFile e os outros campos
     var request = MultipartRequest(
       'POST',
@@ -37,6 +43,8 @@ Future<dynamic> speechAceRequest(
     request.fields['text'] = text;
     request.fields['include_unknown_words'] = '1';
 
+    print('REQUEST');
+    print(request);
     // Envia a requisição
     var response = await request.send();
     if (response.statusCode == 200) {

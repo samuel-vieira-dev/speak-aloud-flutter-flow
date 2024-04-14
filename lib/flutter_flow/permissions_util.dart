@@ -10,6 +10,8 @@ const kPermissionStateToBool = {
 };
 
 final microphonePermission = Permission.microphone;
+final photoLibraryPermission = Permission.photos;
+final notificationsPermission = Permission.notification;
 
 Future<bool> getPermissionStatus(Permission setting) async {
   final status = await setting.status;

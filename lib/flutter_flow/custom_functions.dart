@@ -16,7 +16,7 @@ String processWordScoreListToHtml(List<dynamic>? wordScoreList) {
   if (wordScoreList == null) return "";
 
   var htmlString =
-      '<div style="text-align: center; font-weight: bold; font-size: 18px; word-wrap: break-word;">';
+      '<div style="text-align: center; font-weight: bold; font-size: 14px; word-wrap: break-word;">';
 
   for (var wordScore in wordScoreList) {
     for (var syllable in wordScore['syllable_score_list']) {
@@ -37,7 +37,7 @@ String processWordScoreListToHtml(List<dynamic>? wordScoreList) {
   return htmlString;
 }
 
-bool? isTextFieldEmpty(String? text) {
+bool isTextFieldEmpty(String? text) {
   if (text == null || text == '' || text == ' ') {
     return true;
   }

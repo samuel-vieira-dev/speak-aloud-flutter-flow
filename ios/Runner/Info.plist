@@ -55,7 +55,15 @@
 
 	<key>NSMicrophoneUsageDescription</key>
     <string>Esse aplicativo precisa de acesso ao seu microfone</string>
-
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>Esse aplicativo precisa de acesso à sua biblioteca</string>
+	<key>PermissionGroupNotification</key>
+    <string>Esse aplicativo precisa de acesso as notificações para manter os usuários atualizados e também para lembrá-los de voltar a estudar pelo aplicativo.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
 
 
 	<key>UILaunchStoryboardName</key>

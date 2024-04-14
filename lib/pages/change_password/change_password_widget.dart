@@ -180,7 +180,6 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                           fontFamily: 'Lato',
                           letterSpacing: 0.0,
                         ),
-                    minLines: null,
                     validator: _model.emailAddressControllerValidator
                         .asValidator(context),
                   ),

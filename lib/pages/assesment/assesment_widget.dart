@@ -22,6 +22,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'assesment_model.dart';
@@ -41,15 +42,36 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
   final scaffoldKey = GlobalKey<ScaffoldState>();
   var hasIconTriggered2 = false;
   final animationsMap = {
-    'rowOnPageLoadAnimation': AnimationInfo(
+    'progressBarOnPageLoadAnimation': AnimationInfo(
+      loop: true,
       trigger: AnimationTrigger.onPageLoad,
       effects: [
-        FadeEffect(
-          curve: Curves.easeIn,
-          delay: 0.ms,
-          duration: 600.ms,
+        RotateEffect(
+          curve: Curves.easeInOut,
+          delay: 200.ms,
+          duration: 1200.ms,
           begin: 0.0,
           end: 1.0,
+        ),
+      ],
+    ),
+    'textOnPageLoadAnimation': AnimationInfo(
+      loop: true,
+      trigger: AnimationTrigger.onPageLoad,
+      effects: [
+        MoveEffect(
+          curve: Curves.bounceOut,
+          delay: 150.ms,
+          duration: 1000.ms,
+          begin: Offset(-10.0, 0.0),
+          end: Offset(20.0, 0.0),
+        ),
+        MoveEffect(
+          curve: Curves.bounceOut,
+          delay: 1150.ms,
+          duration: 1000.ms,
+          begin: Offset(20.0, 0.0),
+          end: Offset(-10.0, 0.0),
         ),
       ],
     ),
@@ -306,7 +328,8 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                         letterSpacing: 0.0,
                                                       ),
                                                   textAlign: TextAlign.center,
-                                                  maxLines: 2,
+                                                  maxLines: 3,
+                                                  minLines: 1,
                                                   validator: _model
                                                       .textFieldAssesmentControllerValidator
                                                       .asValidator(context),
@@ -355,7 +378,8 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                if (_model.isAssessmentDone)
+                                if (_model.isAssessmentDone ||
+                                    _model.isAssessmentLoading)
                                   Flexible(
                                     child: Padding(
                                       padding: EdgeInsets.all(20.0),
@@ -365,231 +389,219 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                 1.0,
                                         height: 150.0,
                                         decoration: BoxDecoration(
-                                          color: Color(0x32FF9300),
+                                          color: Color(0x00FF9300),
                                           borderRadius:
                                               BorderRadius.circular(24.0),
                                         ),
                                         child: Stack(
                                           children: [
-                                            if (_model.isAssessmentSuccess)
-                                              Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Flexible(
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        if (_model.scoreTitle ==
-                                                            'Muito bem')
-                                                          Container(
-                                                            width: 100.0,
-                                                            height: 100.0,
-                                                            child: Stack(
-                                                              children: [
-                                                                ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8.0),
-                                                                  child: Image
-                                                                      .asset(
-                                                                    'assets/images/muitobom-removebg-preview.png',
-                                                                    width:
-                                                                        100.0,
-                                                                    height:
-                                                                        100.0,
-                                                                    fit: BoxFit
-                                                                        .cover,
+                                            if (_model.isAssessmentSuccess &&
+                                                !_model.isAssessmentLoading)
+                                              Card(
+                                                clipBehavior:
+                                                    Clip.antiAliasWithSaveLayer,
+                                                color: Color(0xFFF6E7B6),
+                                                elevation: 4.0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          24.0),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    Flexible(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          if (_model
+                                                                  .scoreTitle ==
+                                                              'Muito bem')
+                                                            Container(
+                                                              width: 100.0,
+                                                              height: 100.0,
+                                                              child: Stack(
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                    child: Image
+                                                                        .asset(
+                                                                      'assets/images/muitobom-removebg-preview.png',
+                                                                      width:
+                                                                          100.0,
+                                                                      height:
+                                                                          100.0,
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                                Align(
-                                                                  alignment:
-                                                                      AlignmentDirectional(
-                                                                          0.0,
-                                                                          0.0),
-                                                                  child: Text(
-                                                                    '${_model.scoreValue?.toString()}%',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Lato',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primaryBackground,
-                                                                          fontSize:
-                                                                              18.0,
-                                                                          letterSpacing:
-                                                                              0.0,
-                                                                          fontWeight:
-                                                                              FontWeight.w900,
-                                                                          lineHeight:
-                                                                              0.0,
-                                                                        ),
+                                                                  Align(
+                                                                    alignment:
+                                                                        AlignmentDirectional(
+                                                                            0.0,
+                                                                            0.0),
+                                                                    child: Text(
+                                                                      '${_model.scoreValue?.toString()}%',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Lato',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).primaryBackground,
+                                                                            fontSize:
+                                                                                18.0,
+                                                                            letterSpacing:
+                                                                                0.0,
+                                                                            fontWeight:
+                                                                                FontWeight.w900,
+                                                                            lineHeight:
+                                                                                0.0,
+                                                                          ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        if (_model.scoreTitle ==
-                                                            'Quase lá')
-                                                          Container(
-                                                            width: 100.0,
-                                                            height: 100.0,
-                                                            child: Stack(
-                                                              children: [
-                                                                ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8.0),
-                                                                  child: Image
-                                                                      .asset(
-                                                                    'assets/images/qausela-removebg-preview.png',
-                                                                    width:
-                                                                        100.0,
-                                                                    height:
-                                                                        100.0,
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                  ),
-                                                                ),
-                                                                Align(
-                                                                  alignment:
-                                                                      AlignmentDirectional(
-                                                                          0.0,
-                                                                          0.0),
-                                                                  child: Text(
-                                                                    '${_model.scoreValue?.toString()}%',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Lato',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primaryBackground,
-                                                                          fontSize:
-                                                                              18.0,
-                                                                          letterSpacing:
-                                                                              0.0,
-                                                                          fontWeight:
-                                                                              FontWeight.w900,
-                                                                          lineHeight:
-                                                                              2.0,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        if (_model.scoreTitle ==
-                                                            'Dá pra melhorar')
-                                                          Container(
-                                                            width: 100.0,
-                                                            height: 100.0,
-                                                            child: Stack(
-                                                              children: [
-                                                                ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8.0),
-                                                                  child: Image
-                                                                      .asset(
-                                                                    'assets/images/ruim-removebg-preview.png',
-                                                                    width:
-                                                                        100.0,
-                                                                    height:
-                                                                        100.0,
-                                                                    fit: BoxFit
-                                                                        .cover,
-                                                                  ),
-                                                                ),
-                                                                Align(
-                                                                  alignment:
-                                                                      AlignmentDirectional(
-                                                                          0.0,
-                                                                          0.0),
-                                                                  child: Text(
-                                                                    '${_model.scoreValue?.toString()}%',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                          fontFamily:
-                                                                              'Lato',
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).primaryBackground,
-                                                                          fontSize:
-                                                                              18.0,
-                                                                          letterSpacing:
-                                                                              0.0,
-                                                                          fontWeight:
-                                                                              FontWeight.w900,
-                                                                          lineHeight:
-                                                                              2.0,
-                                                                        ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          valueOrDefault<
-                                                              String>(
-                                                            _model.scoreTitle,
-                                                            '0',
-                                                          ),
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .titleMedium
-                                                              .override(
-                                                                fontFamily:
-                                                                    'Lato',
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .primaryBackground,
-                                                                letterSpacing:
-                                                                    0.0,
+                                                                ],
                                                               ),
-                                                        ),
-                                                        Flexible(
-                                                          child: Text(
+                                                            ),
+                                                          if (_model
+                                                                  .scoreTitle ==
+                                                              'Quase lá')
+                                                            Container(
+                                                              width: 100.0,
+                                                              height: 100.0,
+                                                              child: Stack(
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                    child: Image
+                                                                        .asset(
+                                                                      'assets/images/qausela-removebg-preview.png',
+                                                                      width:
+                                                                          100.0,
+                                                                      height:
+                                                                          100.0,
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
+                                                                  ),
+                                                                  Align(
+                                                                    alignment:
+                                                                        AlignmentDirectional(
+                                                                            0.0,
+                                                                            0.0),
+                                                                    child: Text(
+                                                                      '${_model.scoreValue?.toString()}%',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Lato',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).primaryBackground,
+                                                                            fontSize:
+                                                                                18.0,
+                                                                            letterSpacing:
+                                                                                0.0,
+                                                                            fontWeight:
+                                                                                FontWeight.w900,
+                                                                            lineHeight:
+                                                                                2.0,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          if (_model
+                                                                  .scoreTitle ==
+                                                              'Dá pra melhorar')
+                                                            Container(
+                                                              width: 100.0,
+                                                              height: 100.0,
+                                                              child: Stack(
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            8.0),
+                                                                    child: Image
+                                                                        .asset(
+                                                                      'assets/images/ruim-removebg-preview.png',
+                                                                      width:
+                                                                          100.0,
+                                                                      height:
+                                                                          100.0,
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
+                                                                  ),
+                                                                  Align(
+                                                                    alignment:
+                                                                        AlignmentDirectional(
+                                                                            0.0,
+                                                                            0.0),
+                                                                    child: Text(
+                                                                      '${_model.scoreValue?.toString()}%',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .override(
+                                                                            fontFamily:
+                                                                                'Lato',
+                                                                            color:
+                                                                                FlutterFlowTheme.of(context).primaryBackground,
+                                                                            fontSize:
+                                                                                18.0,
+                                                                            letterSpacing:
+                                                                                0.0,
+                                                                            fontWeight:
+                                                                                FontWeight.w900,
+                                                                            lineHeight:
+                                                                                2.0,
+                                                                          ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
                                                             valueOrDefault<
                                                                 String>(
-                                                              _model.scoreText,
+                                                              _model.scoreTitle,
                                                               '0',
                                                             ),
                                                             style: FlutterFlowTheme
@@ -601,27 +613,45 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                                   color: FlutterFlowTheme.of(
                                                                           context)
                                                                       .primaryBackground,
-                                                                  fontSize:
-                                                                      16.0,
                                                                   letterSpacing:
                                                                       0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal,
                                                                 ),
                                                           ),
-                                                        ),
-                                                      ],
+                                                          Flexible(
+                                                            child: Text(
+                                                              valueOrDefault<
+                                                                  String>(
+                                                                _model
+                                                                    .scoreText,
+                                                                '0',
+                                                              ),
+                                                              style: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .titleMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Lato',
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .primaryBackground,
+                                                                    fontSize:
+                                                                        16.0,
+                                                                    letterSpacing:
+                                                                        0.0,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                ]
-                                                    .divide(
-                                                        SizedBox(width: 20.0))
-                                                    .addToStart(
-                                                        SizedBox(width: 20.0)),
-                                              ).animateOnPageLoad(animationsMap[
-                                                  'rowOnPageLoadAnimation']!),
-                                            if (!_model.isAssessmentSuccess)
+                                                  ],
+                                                ),
+                                              ),
+                                            if (!_model.isAssessmentSuccess &&
+                                                !_model.isAssessmentLoading)
                                               Card(
                                                 clipBehavior:
                                                     Clip.antiAliasWithSaveLayer,
@@ -757,6 +787,113 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                               height: 10.0)),
                                                         ),
                                                       ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            if (_model.isAssessmentLoading)
+                                              Card(
+                                                clipBehavior:
+                                                    Clip.antiAliasWithSaveLayer,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .info,
+                                                elevation: 4.0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          24.0),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      10.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0),
+                                                          child:
+                                                              CircularPercentIndicator(
+                                                            percent: 0.8,
+                                                            radius: 30.0,
+                                                            lineWidth: 4.0,
+                                                            animation: true,
+                                                            animateFromLastPercent:
+                                                                true,
+                                                            progressColor:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .primaryBackground,
+                                                            backgroundColor:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .accent4,
+                                                          ).animateOnPageLoad(
+                                                                  animationsMap[
+                                                                      'progressBarOnPageLoadAnimation']!),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      15.0,
+                                                                      0.0,
+                                                                      0.0,
+                                                                      0.0),
+                                                          child: Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Text(
+                                                                'Analisando áudio...',
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Lato',
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primaryBackground,
+                                                                      fontSize:
+                                                                          20.0,
+                                                                      letterSpacing:
+                                                                          0.0,
+                                                                    ),
+                                                              ).animateOnPageLoad(
+                                                                  animationsMap[
+                                                                      'textOnPageLoadAnimation']!),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
@@ -915,7 +1052,7 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                   microphonePermission)) &&
                                               !functions.isTextFieldEmpty(_model
                                                   .textFieldAssesmentController
-                                                  .text)!)) {
+                                                  .text))) {
                                             return;
                                           }
                                           logFirebaseEvent(
@@ -967,16 +1104,6 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                               'ASSESMENT_PAGE_stopRecording_ON_TAP');
                                           var _shouldSetState = false;
                                           logFirebaseEvent(
-                                              'stopRecording_update_page_state');
-                                          setState(() {
-                                            _model.audioRecording = false;
-                                          });
-                                          logFirebaseEvent(
-                                              'stopRecording_timer');
-                                          _model.recordTimerController
-                                              .onResetTimer();
-
-                                          logFirebaseEvent(
                                               'stopRecording_stop_audio_recording');
                                           await stopAudioRecording(
                                             audioRecorder: _model.audioRecorder,
@@ -991,6 +1118,17 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                           );
 
                                           _shouldSetState = true;
+                                          logFirebaseEvent(
+                                              'stopRecording_timer');
+                                          _model.recordTimerController
+                                              .onResetTimer();
+
+                                          logFirebaseEvent(
+                                              'stopRecording_update_page_state');
+                                          setState(() {
+                                            _model.audioRecording = false;
+                                            _model.isAssessmentLoading = true;
+                                          });
                                           logFirebaseEvent(
                                               'stopRecording_upload_file_to_firebase');
                                           {
@@ -1097,6 +1235,8 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                             setState(() {
                                               _model.isAssessmentSuccess =
                                                   false;
+                                              _model.isAssessmentLoading =
+                                                  false;
                                             });
                                             if (_shouldSetState)
                                               setState(() {});
@@ -1121,6 +1261,7 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                 .toList()
                                                 .cast<dynamic>();
                                             _model.isAssessmentSuccess = true;
+                                            _model.isAssessmentLoading = false;
                                           });
                                           logFirebaseEvent(
                                               'stopRecording_custom_action');
@@ -1182,7 +1323,12 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                 },
                                               ),
                                             });
+                                          } else {
+                                            if (_shouldSetState)
+                                              setState(() {});
+                                            return;
                                           }
+
                                           if (_shouldSetState) setState(() {});
                                         },
                                         child: ClipRRect(

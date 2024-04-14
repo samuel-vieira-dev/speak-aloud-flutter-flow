@@ -153,7 +153,6 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                       fontFamily: 'Lato',
                       letterSpacing: 0.0,
                     ),
-                minLines: null,
                 validator:
                     _model.emailAddressControllerValidator.asValidator(context),
               ),

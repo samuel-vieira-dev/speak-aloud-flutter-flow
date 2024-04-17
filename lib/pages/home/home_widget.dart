@@ -191,15 +191,13 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         AuthUserStreamWidget(
                                           builder: (context) => Text(
                                             valueOrDefault<String>(
-                                              functions
-                                                  .calcularMediaAjustada(
-                                                      (currentUserDocument
-                                                                  ?.averageScore
-                                                                  ?.toList() ??
-                                                              [])
-                                                          .toList())
-                                                  .toString(),
-                                              '0.0',
+                                              functions.calcularMediaAjustada(
+                                                  (currentUserDocument
+                                                              ?.averageScore
+                                                              ?.toList() ??
+                                                          [])
+                                                      .toList()),
+                                              '0',
                                             ),
                                             style: FlutterFlowTheme.of(context)
                                                 .displaySmall

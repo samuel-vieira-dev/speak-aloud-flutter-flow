@@ -29,10 +29,10 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
     _model = createModel(context, () => LoginPageModel());
 
     logFirebaseEvent('screen_view', parameters: {'screen_name': 'loginPage'});
-    _model.emailAddressLoginController ??= TextEditingController();
+    _model.emailAddressLoginTextController ??= TextEditingController();
     _model.emailAddressLoginFocusNode ??= FocusNode();
 
-    _model.passwordLoginController ??= TextEditingController();
+    _model.passwordLoginTextController ??= TextEditingController();
     _model.passwordLoginFocusNode ??= FocusNode();
   }
 
@@ -117,7 +117,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                     0.0, 20.0, 0.0, 0.0),
                                 child: TextFormField(
                                   controller:
-                                      _model.emailAddressLoginController,
+                                      _model.emailAddressLoginTextController,
                                   focusNode: _model.emailAddressLoginFocusNode,
                                   obscureText: false,
                                   decoration: InputDecoration(
@@ -179,7 +179,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                         letterSpacing: 0.0,
                                       ),
                                   validator: _model
-                                      .emailAddressLoginControllerValidator
+                                      .emailAddressLoginTextControllerValidator
                                       .asValidator(context),
                                 ),
                               ),
@@ -187,7 +187,8 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     0.0, 12.0, 0.0, 0.0),
                                 child: TextFormField(
-                                  controller: _model.passwordLoginController,
+                                  controller:
+                                      _model.passwordLoginTextController,
                                   focusNode: _model.passwordLoginFocusNode,
                                   obscureText: !_model.passwordLoginVisibility,
                                   decoration: InputDecoration(
@@ -263,7 +264,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                         letterSpacing: 0.0,
                                       ),
                                   validator: _model
-                                      .passwordLoginControllerValidator
+                                      .passwordLoginTextControllerValidator
                                       .asValidator(context),
                                 ),
                               ),
@@ -323,8 +324,9 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                       final user =
                                           await authManager.signInWithEmail(
                                         context,
-                                        _model.emailAddressLoginController.text,
-                                        _model.passwordLoginController.text,
+                                        _model.emailAddressLoginTextController
+                                            .text,
+                                        _model.passwordLoginTextController.text,
                                       );
                                       if (user == null) {
                                         return;

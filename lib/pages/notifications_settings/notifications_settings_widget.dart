@@ -103,21 +103,55 @@ class _NotificationsSettingsWidgetState
             ),
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
-              child: SwitchListTile.adaptive(
-                value: _model.switchPushNotificationsValue ??= true,
+              child: AuthUserStreamWidget(
+                builder: (context) => SwitchListTile.adaptive(
+                  value: _model.switchPushNotificationsValue ??=
+                      valueOrDefault<bool>(
+                          currentUserDocument?.optInPushNotifications, false),
+                  onChanged: (newValue) async {
+                    setState(
+                        () => _model.switchPushNotificationsValue = newValue!);
+                  },
+                  title: Text(
+                    'Push',
+                    style: FlutterFlowTheme.of(context).headlineSmall.override(
+                          fontFamily: 'Playfair Display',
+                          letterSpacing: 0.0,
+                        ),
+                  ),
+                  subtitle: Text(
+                    'Receba notificações push do nosso aplicativo direto do seu celular.',
+                    style: FlutterFlowTheme.of(context).bodySmall.override(
+                          fontFamily: 'Lato',
+                          letterSpacing: 0.0,
+                        ),
+                  ),
+                  tileColor: FlutterFlowTheme.of(context).secondaryBackground,
+                  activeColor: FlutterFlowTheme.of(context).primary,
+                  activeTrackColor: FlutterFlowTheme.of(context).primary,
+                  dense: false,
+                  controlAffinity: ListTileControlAffinity.trailing,
+                  contentPadding:
+                      EdgeInsetsDirectional.fromSTEB(24.0, 12.0, 24.0, 12.0),
+                ),
+              ),
+            ),
+            AuthUserStreamWidget(
+              builder: (context) => SwitchListTile.adaptive(
+                value: _model.switchEmailValue ??= valueOrDefault<bool>(
+                    currentUserDocument?.optInEmail, false),
                 onChanged: (newValue) async {
-                  setState(
-                      () => _model.switchPushNotificationsValue = newValue!);
+                  setState(() => _model.switchEmailValue = newValue!);
                 },
                 title: Text(
-                  'Push',
+                  'Email',
                   style: FlutterFlowTheme.of(context).headlineSmall.override(
                         fontFamily: 'Playfair Display',
                         letterSpacing: 0.0,
                       ),
                 ),
                 subtitle: Text(
-                  'Receba notificações push do nosso aplicativo direto do seu celular.',
+                  'Receba notificações por e-mail de nossa equipe de marketing sobre novos recursos.',
                   style: FlutterFlowTheme.of(context).bodySmall.override(
                         fontFamily: 'Lato',
                         letterSpacing: 0.0,
@@ -131,33 +165,6 @@ class _NotificationsSettingsWidgetState
                 contentPadding:
                     EdgeInsetsDirectional.fromSTEB(24.0, 12.0, 24.0, 12.0),
               ),
-            ),
-            SwitchListTile.adaptive(
-              value: _model.switchEmailValue ??= true,
-              onChanged: (newValue) async {
-                setState(() => _model.switchEmailValue = newValue!);
-              },
-              title: Text(
-                'Email',
-                style: FlutterFlowTheme.of(context).headlineSmall.override(
-                      fontFamily: 'Playfair Display',
-                      letterSpacing: 0.0,
-                    ),
-              ),
-              subtitle: Text(
-                'Receba notificações por e-mail de nossa equipe de marketing sobre novos recursos.',
-                style: FlutterFlowTheme.of(context).bodySmall.override(
-                      fontFamily: 'Lato',
-                      letterSpacing: 0.0,
-                    ),
-              ),
-              tileColor: FlutterFlowTheme.of(context).secondaryBackground,
-              activeColor: FlutterFlowTheme.of(context).primary,
-              activeTrackColor: FlutterFlowTheme.of(context).primary,
-              dense: false,
-              controlAffinity: ListTileControlAffinity.trailing,
-              contentPadding:
-                  EdgeInsetsDirectional.fromSTEB(24.0, 12.0, 24.0, 12.0),
             ),
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),

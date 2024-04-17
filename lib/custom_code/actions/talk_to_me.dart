@@ -9,20 +9,29 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:audio_session/audio_session.dart';
 
-Future talkToMe(String text) async {
-  // Create a TTS object
+Future<void> talkToMe(String text) async {
+  // Configurar a sessão de áudio para permitir reprodução no modo silencioso
+  final audioSession = await AudioSession.instance;
+  await audioSession.configure(AudioSessionConfiguration.speech());
+  await audioSession.setActive(true);
+
   FlutterTts flutterTts = FlutterTts();
 
-  // Set language to English. This will use the default English voice.
   await flutterTts.setLanguage("en-US");
+  await flutterTts.setSpeechRate(0.4); // Um pouco mais lento
+  await flutterTts.setPitch(1.1); // Ligeiramente mais alto
 
-  // Optionally, adjust the speech rate and pitch.
-  // The default values are usually fine for most cases.
-  await flutterTts.setSpeechRate(0.5);
-  await flutterTts.setPitch(0.7);
+  // Ajustando volume (opcional, remova se não necessário)
+  await flutterTts.setVolume(0.8);
 
-  // Speak
+  // Listar vozes disponíveis (descomente para testar vozes)
+  var voices = await flutterTts.getVoices;
+  print(voices);
+  await flutterTts.setVoice({"name": "en-us-x-sfg#male_2", "locale": "en-US"});
+
+  // Falar o texto
   await flutterTts.speak(text);
 }
 

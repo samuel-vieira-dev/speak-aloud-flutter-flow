@@ -123,7 +123,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                   padding:
                       EdgeInsetsDirectional.fromSTEB(20.0, 20.0, 20.0, 0.0),
                   child: TextFormField(
-                    controller: _model.emailAddressController ??=
+                    controller: _model.emailAddressTextController ??=
                         TextEditingController(
                       text: columnUsersRecord.email,
                     ),
@@ -180,7 +180,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                           fontFamily: 'Lato',
                           letterSpacing: 0.0,
                         ),
-                    validator: _model.emailAddressControllerValidator
+                    validator: _model.emailAddressTextControllerValidator
                         .asValidator(context),
                   ),
                 ),
@@ -191,7 +191,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                       logFirebaseEvent(
                           'CHANGE_PASSWORD_PAGE_Button-Login_ON_TAP');
                       logFirebaseEvent('Button-Login_auth');
-                      if (_model.emailAddressController.text.isEmpty) {
+                      if (_model.emailAddressTextController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -202,7 +202,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                         return;
                       }
                       await authManager.resetPassword(
-                        email: _model.emailAddressController.text,
+                        email: _model.emailAddressTextController.text,
                         context: context,
                       );
                     },

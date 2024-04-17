@@ -27,7 +27,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
 
     logFirebaseEvent('screen_view',
         parameters: {'screen_name': 'forgotPassword'});
-    _model.emailAddressController ??= TextEditingController();
+    _model.emailAddressTextController ??= TextEditingController();
     _model.emailAddressFocusNode ??= FocusNode();
   }
 
@@ -102,7 +102,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(20.0, 20.0, 20.0, 0.0),
               child: TextFormField(
-                controller: _model.emailAddressController,
+                controller: _model.emailAddressTextController,
                 focusNode: _model.emailAddressFocusNode,
                 obscureText: false,
                 decoration: InputDecoration(
@@ -153,8 +153,8 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                       fontFamily: 'Lato',
                       letterSpacing: 0.0,
                     ),
-                validator:
-                    _model.emailAddressControllerValidator.asValidator(context),
+                validator: _model.emailAddressTextControllerValidator
+                    .asValidator(context),
               ),
             ),
             Padding(
@@ -163,7 +163,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                 onPressed: () async {
                   logFirebaseEvent('FORGOT_PASSWORD_PAGE_Button-Login_ON_TAP');
                   logFirebaseEvent('Button-Login_auth');
-                  if (_model.emailAddressController.text.isEmpty) {
+                  if (_model.emailAddressTextController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -174,7 +174,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                     return;
                   }
                   await authManager.resetPassword(
-                    email: _model.emailAddressController.text,
+                    email: _model.emailAddressTextController.text,
                     context: context,
                   );
                 },

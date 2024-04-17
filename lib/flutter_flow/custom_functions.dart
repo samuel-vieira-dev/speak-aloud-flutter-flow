@@ -44,10 +44,10 @@ bool isTextFieldEmpty(String? text) {
   return false;
 }
 
-double calcularMediaAjustada(List<int> listaNotas) {
+String calcularMediaAjustada(List<int> listaNotas) {
   // Verifica se a lista está vazia para evitar divisão por zero
   if (listaNotas.isEmpty) {
-    return 0.0;
+    return "0.0";
   }
 
   // Calcula a soma de todos os valores na lista
@@ -59,8 +59,8 @@ double calcularMediaAjustada(List<int> listaNotas) {
   // Ajusta a média para a escala de 0.0 a 5.0
   double mediaAjustada = (mediaOriginal * 5) / 100;
 
-  // Arredonda para uma casa decimal
-  return double.parse(mediaAjustada.toStringAsFixed(1));
+  // Arredonda para uma casa decimal e retorna como string
+  return mediaAjustada.toStringAsFixed(1);
 }
 
 bool hasOffensiveUpdate(int updateOffensiveDaysTimestamp) {

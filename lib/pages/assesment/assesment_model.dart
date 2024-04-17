@@ -1,4 +1,5 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/api_requests/api_calls.dart';
 import '/backend/backend.dart';
 import '/backend/custom_cloud_functions/custom_cloud_function_response_manager.dart';
 import '/backend/firebase_storage/storage.dart';
@@ -56,14 +57,20 @@ class AssesmentModel extends FlutterFlowModel<AssesmentWidget> {
 
   bool isAssessmentLoading = false;
 
+  String? wordsWithErrorTitle;
+
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
   // State field(s) for textFieldAssesment widget.
   FocusNode? textFieldAssesmentFocusNode;
-  TextEditingController? textFieldAssesmentController;
+  TextEditingController? textFieldAssesmentTextController;
   String? Function(BuildContext, String?)?
-      textFieldAssesmentControllerValidator;
+      textFieldAssesmentTextControllerValidator;
+  // Stores action output result for [Backend Call - API (ValidateTextAPI)] action in IconButton widget.
+  ApiCallResponse? validateTextResult;
+  // Stores action output result for [Custom Action - isAssessmentSuccess] action in IconButton widget.
+  bool? isValidateSuccess;
   // Stores action output result for [Custom Action - obterFraseAleatoriaAction] action in RandomPhraseButton widget.
   String? fraseAleatoria;
   // State field(s) for RecordTimer widget.
@@ -101,7 +108,7 @@ class AssesmentModel extends FlutterFlowModel<AssesmentWidget> {
   void dispose() {
     unfocusNode.dispose();
     textFieldAssesmentFocusNode?.dispose();
-    textFieldAssesmentController?.dispose();
+    textFieldAssesmentTextController?.dispose();
 
     recordTimerController.dispose();
   }

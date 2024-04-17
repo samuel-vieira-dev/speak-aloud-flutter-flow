@@ -1,4 +1,5 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/api_requests/api_calls.dart';
 import '/backend/backend.dart';
 import '/backend/custom_cloud_functions/custom_cloud_function_response_manager.dart';
 import '/backend/firebase_storage/storage.dart';
@@ -40,69 +41,8 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
   late AssesmentModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  var hasIconTriggered2 = false;
-  final animationsMap = {
-    'progressBarOnPageLoadAnimation': AnimationInfo(
-      loop: true,
-      trigger: AnimationTrigger.onPageLoad,
-      effects: [
-        RotateEffect(
-          curve: Curves.easeInOut,
-          delay: 200.ms,
-          duration: 1200.ms,
-          begin: 0.0,
-          end: 1.0,
-        ),
-      ],
-    ),
-    'textOnPageLoadAnimation': AnimationInfo(
-      loop: true,
-      trigger: AnimationTrigger.onPageLoad,
-      effects: [
-        MoveEffect(
-          curve: Curves.bounceOut,
-          delay: 150.ms,
-          duration: 1000.ms,
-          begin: Offset(-10.0, 0.0),
-          end: Offset(20.0, 0.0),
-        ),
-        MoveEffect(
-          curve: Curves.bounceOut,
-          delay: 1150.ms,
-          duration: 1000.ms,
-          begin: Offset(20.0, 0.0),
-          end: Offset(-10.0, 0.0),
-        ),
-      ],
-    ),
-    'iconOnActionTriggerAnimation1': AnimationInfo(
-      trigger: AnimationTrigger.onActionTrigger,
-      applyInitialState: true,
-      effects: [
-        FlipEffect(
-          curve: Curves.bounceOut,
-          delay: 0.ms,
-          duration: 850.ms,
-          begin: 1.0,
-          end: 2.0,
-        ),
-      ],
-    ),
-    'iconOnActionTriggerAnimation2': AnimationInfo(
-      trigger: AnimationTrigger.onActionTrigger,
-      applyInitialState: false,
-      effects: [
-        ShakeEffect(
-          curve: Curves.bounceOut,
-          delay: 0.ms,
-          duration: 1870.ms,
-          hz: 12,
-          offset: Offset(0.0, 0.0),
-          rotation: 0.087,
-        ),
-      ],
-    ),
-  };
+
+  final animationsMap = <String, AnimationInfo>{};
 
   @override
   void initState() {
@@ -110,9 +50,84 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
     _model = createModel(context, () => AssesmentModel());
 
     logFirebaseEvent('screen_view', parameters: {'screen_name': 'assesment'});
-    _model.textFieldAssesmentController ??= TextEditingController();
+    _model.textFieldAssesmentTextController ??= TextEditingController();
     _model.textFieldAssesmentFocusNode ??= FocusNode();
 
+    animationsMap.addAll({
+      'iconButtonOnActionTriggerAnimation': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: true,
+        effectsBuilder: () => [
+          RotateEffect(
+            curve: Curves.easeInOut,
+            delay: 0.0.ms,
+            duration: 1420.0.ms,
+            begin: 0.0,
+            end: 2.0,
+          ),
+        ],
+      ),
+      'progressBarOnPageLoadAnimation': AnimationInfo(
+        loop: true,
+        trigger: AnimationTrigger.onPageLoad,
+        effectsBuilder: () => [
+          RotateEffect(
+            curve: Curves.easeInOut,
+            delay: 200.0.ms,
+            duration: 1200.0.ms,
+            begin: 0.0,
+            end: 1.0,
+          ),
+        ],
+      ),
+      'textOnPageLoadAnimation': AnimationInfo(
+        loop: true,
+        trigger: AnimationTrigger.onPageLoad,
+        effectsBuilder: () => [
+          MoveEffect(
+            curve: Curves.bounceOut,
+            delay: 150.0.ms,
+            duration: 1000.0.ms,
+            begin: Offset(-10.0, 0.0),
+            end: Offset(10.0, 0.0),
+          ),
+          MoveEffect(
+            curve: Curves.bounceOut,
+            delay: 1150.0.ms,
+            duration: 1000.0.ms,
+            begin: Offset(10.0, 0.0),
+            end: Offset(-10.0, 0.0),
+          ),
+        ],
+      ),
+      'iconOnActionTriggerAnimation1': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: true,
+        effectsBuilder: () => [
+          FlipEffect(
+            curve: Curves.bounceOut,
+            delay: 0.0.ms,
+            duration: 850.0.ms,
+            begin: 1.0,
+            end: 2.0,
+          ),
+        ],
+      ),
+      'iconOnActionTriggerAnimation2': AnimationInfo(
+        trigger: AnimationTrigger.onActionTrigger,
+        applyInitialState: true,
+        effectsBuilder: () => [
+          ShakeEffect(
+            curve: Curves.bounceOut,
+            delay: 0.0.ms,
+            duration: 1870.0.ms,
+            hz: 12,
+            offset: Offset(0.0, 0.0),
+            rotation: 0.087,
+          ),
+        ],
+      ),
+    });
     setupAnimations(
       animationsMap.values.where((anim) =>
           anim.trigger == AnimationTrigger.onActionTrigger ||
@@ -171,15 +186,16 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
+                          flex: 1,
                           child: Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
-                                0.0, 20.0, 0.0, 0.0),
+                                0.0, 20.0, 0.0, 20.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Flexible(
+                                Expanded(
                                   child: InkWell(
                                     splashColor: Colors.transparent,
                                     focusColor: Colors.transparent,
@@ -194,178 +210,293 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                         _model.isTextSaved = false;
                                       });
                                     },
-                                    child: Container(
-                                      height: 50.0,
-                                      child: Stack(
-                                        children: [
-                                          if ((!_model.isAssessmentDone ||
-                                                  !_model
-                                                      .isAssessmentSuccess) &&
-                                              !_model.isTextSaved)
-                                            Padding(
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
-                                                      20.0, 0.0, 20.0, 0.0),
-                                              child: Container(
-                                                width:
-                                                    MediaQuery.sizeOf(context)
-                                                            .width *
-                                                        1.0,
-                                                child: TextFormField(
-                                                  controller: _model
-                                                      .textFieldAssesmentController,
-                                                  focusNode: _model
-                                                      .textFieldAssesmentFocusNode,
-                                                  onChanged: (_) =>
-                                                      EasyDebounce.debounce(
-                                                    '_model.textFieldAssesmentController',
-                                                    Duration(milliseconds: 0),
-                                                    () async {
-                                                      logFirebaseEvent(
-                                                          'ASSESMENT_textFieldAssesment_ON_TEXTFIEL');
-                                                      logFirebaseEvent(
-                                                          'textFieldAssesment_update_page_state');
-                                                      setState(() {
-                                                        _model.isAssessmentDone =
-                                                            false;
-                                                        _model.wordsWithError =
-                                                            _model
-                                                                .textFieldAssesmentController
-                                                                .text;
-                                                        _model.isTextSaved =
-                                                            false;
-                                                      });
-                                                    },
-                                                  ),
-                                                  autofocus: false,
-                                                  obscureText: false,
-                                                  decoration: InputDecoration(
-                                                    isDense: false,
-                                                    alignLabelWithHint: false,
-                                                    hintText:
-                                                        'Clique para escrever a frase',
-                                                    hintStyle: FlutterFlowTheme
-                                                            .of(context)
-                                                        .labelLarge
-                                                        .override(
-                                                          fontFamily: 'Lato',
-                                                          fontSize: 14.0,
-                                                          letterSpacing: 0.0,
-                                                        ),
-                                                    enabledBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: FlutterFlowTheme
-                                                                .of(context)
-                                                            .primaryBackground,
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              0.0),
-                                                    ),
-                                                    focusedBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color: FlutterFlowTheme
-                                                                .of(context)
-                                                            .primaryBackground,
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              0.0),
-                                                    ),
-                                                    errorBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .error,
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              0.0),
-                                                    ),
-                                                    focusedErrorBorder:
-                                                        UnderlineInputBorder(
-                                                      borderSide: BorderSide(
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .error,
-                                                        width: 2.0,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              0.0),
-                                                    ),
-                                                    filled: true,
-                                                    fillColor:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .primaryText,
-                                                    suffixIcon: Icon(
-                                                      Icons.edit,
+                                    child: Stack(
+                                      children: [
+                                        if ((!_model.isAssessmentDone ||
+                                                !_model.isAssessmentSuccess) &&
+                                            !_model.isTextSaved)
+                                          Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    20.0, 0.0, 20.0, 0.0),
+                                            child: Container(
+                                              width: MediaQuery.sizeOf(context)
+                                                      .width *
+                                                  1.0,
+                                              child: TextFormField(
+                                                controller: _model
+                                                    .textFieldAssesmentTextController,
+                                                focusNode: _model
+                                                    .textFieldAssesmentFocusNode,
+                                                onChanged: (_) =>
+                                                    EasyDebounce.debounce(
+                                                  '_model.textFieldAssesmentTextController',
+                                                  Duration(milliseconds: 0),
+                                                  () async {
+                                                    logFirebaseEvent(
+                                                        'ASSESMENT_textFieldAssesment_ON_TEXTFIEL');
+                                                    logFirebaseEvent(
+                                                        'textFieldAssesment_update_page_state');
+                                                    setState(() {
+                                                      _model.isAssessmentDone =
+                                                          false;
+                                                    });
+                                                  },
+                                                ),
+                                                autofocus: false,
+                                                obscureText: false,
+                                                decoration: InputDecoration(
+                                                  isDense: false,
+                                                  alignLabelWithHint: false,
+                                                  hintText:
+                                                      'Clique para escrever a frase',
+                                                  hintStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .labelLarge
+                                                          .override(
+                                                            fontFamily: 'Lato',
+                                                            fontSize: 14.0,
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
                                                       color: FlutterFlowTheme
                                                               .of(context)
                                                           .primaryBackground,
-                                                      size: 20.0,
+                                                      width: 2.0,
                                                     ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            0.0),
                                                   ),
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .labelLarge
-                                                      .override(
-                                                        fontFamily: 'Lato',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryText,
-                                                        fontSize: 14.0,
-                                                        letterSpacing: 0.0,
-                                                      ),
-                                                  textAlign: TextAlign.center,
-                                                  maxLines: 3,
-                                                  minLines: 1,
-                                                  validator: _model
-                                                      .textFieldAssesmentControllerValidator
-                                                      .asValidator(context),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: FlutterFlowTheme
+                                                              .of(context)
+                                                          .primaryBackground,
+                                                      width: 2.0,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            0.0),
+                                                  ),
+                                                  errorBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .error,
+                                                      width: 2.0,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            0.0),
+                                                  ),
+                                                  focusedErrorBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .error,
+                                                      width: 2.0,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            0.0),
+                                                  ),
+                                                  filled: true,
+                                                  fillColor:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .primaryText,
+                                                  suffixIcon: Icon(
+                                                    Icons.edit,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primaryBackground,
+                                                    size: 20.0,
+                                                  ),
                                                 ),
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .labelLarge
+                                                        .override(
+                                                          fontFamily: 'Lato',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .secondaryText,
+                                                          fontSize: 14.0,
+                                                          letterSpacing: 0.0,
+                                                        ),
+                                                textAlign: TextAlign.center,
+                                                maxLines: null,
+                                                minLines: 1,
+                                                maxLength: 180,
+                                                validator: _model
+                                                    .textFieldAssesmentTextControllerValidator
+                                                    .asValidator(context),
                                               ),
                                             ),
-                                          if (_model.isAssessmentDone &&
-                                              _model.isAssessmentSuccess)
-                                            InkWell(
-                                              splashColor: Colors.transparent,
-                                              focusColor: Colors.transparent,
-                                              hoverColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
-                                              onTap: () async {
-                                                logFirebaseEvent(
-                                                    'ASSESMENT_PAGE_HtmlViewResult_ON_TAP');
-                                                logFirebaseEvent(
-                                                    'HtmlViewResult_update_page_state');
-                                                setState(() {
-                                                  _model.isAssessmentDone =
-                                                      false;
-                                                });
-                                              },
-                                              child: Html(
-                                                data: functions
-                                                    .processWordScoreListToHtml(
-                                                        _model.wordScoreList
-                                                            .toList()),
-                                                onLinkTap: (url, _, __, ___) =>
-                                                    launchURL(url!),
-                                              ),
+                                          ),
+                                        if (_model.isAssessmentDone &&
+                                            _model.isAssessmentSuccess)
+                                          InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              logFirebaseEvent(
+                                                  'ASSESMENT_PAGE_HtmlViewResult_ON_TAP');
+                                              logFirebaseEvent(
+                                                  'HtmlViewResult_update_page_state');
+                                              setState(() {
+                                                _model.isAssessmentDone = false;
+                                              });
+                                            },
+                                            child: Html(
+                                              data: functions
+                                                  .processWordScoreListToHtml(
+                                                      _model.wordScoreList
+                                                          .toList()),
+                                              onLinkTap: (url, _, __, ___) =>
+                                                  launchURL(url!),
                                             ),
-                                        ],
-                                      ),
+                                          ),
+                                      ],
                                     ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 15.0, 0.0),
+                                  child: FlutterFlowIconButton(
+                                    borderColor:
+                                        FlutterFlowTheme.of(context).primary,
+                                    borderRadius: 20.0,
+                                    borderWidth: 1.0,
+                                    buttonSize: 40.0,
+                                    fillColor:
+                                        FlutterFlowTheme.of(context).primary,
+                                    disabledColor: FlutterFlowTheme.of(context)
+                                        .secondaryText,
+                                    icon: Icon(
+                                      Icons.spellcheck_sharp,
+                                      color: FlutterFlowTheme.of(context)
+                                          .primaryText,
+                                      size: 24.0,
+                                    ),
+                                    onPressed: functions.isTextFieldEmpty(_model
+                                            .textFieldAssesmentTextController
+                                            .text)
+                                        ? null
+                                        : () async {
+                                            logFirebaseEvent(
+                                                'ASSESMENT_spellcheck_sharp_ICN_ON_TAP');
+                                            logFirebaseEvent(
+                                                'IconButton_widget_animation');
+                                            if (animationsMap[
+                                                    'iconButtonOnActionTriggerAnimation'] !=
+                                                null) {
+                                              animationsMap[
+                                                      'iconButtonOnActionTriggerAnimation']!
+                                                  .controller
+                                                  .repeat();
+                                            }
+                                            logFirebaseEvent(
+                                                'IconButton_backend_call');
+                                            _model.validateTextResult =
+                                                await ValidateTextAPICall.call(
+                                              text: _model
+                                                  .textFieldAssesmentTextController
+                                                  .text,
+                                            );
+                                            logFirebaseEvent(
+                                                'IconButton_custom_action');
+                                            _model.isValidateSuccess =
+                                                await actions
+                                                    .isAssessmentSuccess(
+                                              getJsonField(
+                                                (_model.validateTextResult
+                                                        ?.jsonBody ??
+                                                    ''),
+                                                r'''$.status''',
+                                              ).toString(),
+                                            );
+                                            if (_model.isValidateSuccess!) {
+                                              logFirebaseEvent(
+                                                  'IconButton_update_page_state');
+                                              setState(() {
+                                                _model.wordsWithErrorTitle =
+                                                    'Tudo certo!';
+                                                _model.wordsWithError =
+                                                    'Nenhum erro ortográfico encontrado.';
+                                              });
+                                            } else {
+                                              logFirebaseEvent(
+                                                  'IconButton_update_page_state');
+                                              setState(() {
+                                                _model.wordsWithErrorTitle =
+                                                    'Ops...';
+                                                _model.wordsWithError =
+                                                    valueOrDefault<String>(
+                                                  (String wrongwords) {
+                                                    return "As palavras: " +
+                                                        wrongwords +
+                                                        " não foram identificadas.";
+                                                  }(getJsonField(
+                                                    (_model.validateTextResult
+                                                            ?.jsonBody ??
+                                                        ''),
+                                                    r'''$.detail_message''',
+                                                  ).toString()),
+                                                  'Algumas palavras não foram identificadas corretamente',
+                                                );
+                                              });
+                                            }
+
+                                            logFirebaseEvent(
+                                                'IconButton_widget_animation');
+                                            if (animationsMap[
+                                                    'iconButtonOnActionTriggerAnimation'] !=
+                                                null) {
+                                              animationsMap[
+                                                      'iconButtonOnActionTriggerAnimation']!
+                                                  .controller
+                                                  .reset();
+                                            }
+                                            logFirebaseEvent(
+                                                'IconButton_alert_dialog');
+                                            await showDialog(
+                                              context: context,
+                                              builder: (alertDialogContext) {
+                                                return AlertDialog(
+                                                  title: Text(_model
+                                                      .wordsWithErrorTitle!),
+                                                  content: Text(
+                                                      _model.wordsWithError!),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              alertDialogContext),
+                                                      child: Text('Ok'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+
+                                            setState(() {});
+                                          },
+                                  ).animateOnActionTrigger(
+                                    animationsMap[
+                                        'iconButtonOnActionTriggerAnimation']!,
                                   ),
                                 ),
                               ],
@@ -407,222 +538,187 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                       BorderRadius.circular(
                                                           24.0),
                                                 ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    Flexible(
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          if (_model
-                                                                  .scoreTitle ==
-                                                              'Muito bem')
-                                                            Container(
-                                                              width: 100.0,
-                                                              height: 100.0,
-                                                              child: Stack(
-                                                                children: [
-                                                                  ClipRRect(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/muitobom-removebg-preview.png',
-                                                                      width:
-                                                                          100.0,
-                                                                      height:
-                                                                          100.0,
-                                                                      fit: BoxFit
-                                                                          .cover,
+                                                child: Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          20.0, 0.0, 0.0, 0.0),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Flexible(
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            if (_model
+                                                                    .scoreTitle ==
+                                                                'Muito bem')
+                                                              Container(
+                                                                width: 100.0,
+                                                                height: 100.0,
+                                                                child: Stack(
+                                                                  children: [
+                                                                    ClipRRect(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                      child: Image
+                                                                          .asset(
+                                                                        'assets/images/muitobom-removebg-preview.png',
+                                                                        width:
+                                                                            100.0,
+                                                                        height:
+                                                                            100.0,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  Align(
-                                                                    alignment:
-                                                                        AlignmentDirectional(
-                                                                            0.0,
-                                                                            0.0),
-                                                                    child: Text(
-                                                                      '${_model.scoreValue?.toString()}%',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Lato',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).primaryBackground,
-                                                                            fontSize:
-                                                                                18.0,
-                                                                            letterSpacing:
-                                                                                0.0,
-                                                                            fontWeight:
-                                                                                FontWeight.w900,
-                                                                            lineHeight:
-                                                                                0.0,
-                                                                          ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          AlignmentDirectional(
+                                                                              0.0,
+                                                                              0.0),
+                                                                      child:
+                                                                          Text(
+                                                                        '${_model.scoreValue?.toString()}%',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium
+                                                                            .override(
+                                                                              fontFamily: 'Lato',
+                                                                              color: FlutterFlowTheme.of(context).primaryBackground,
+                                                                              fontSize: 18.0,
+                                                                              letterSpacing: 0.0,
+                                                                              fontWeight: FontWeight.w900,
+                                                                              lineHeight: 0.0,
+                                                                            ),
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          if (_model
-                                                                  .scoreTitle ==
-                                                              'Quase lá')
-                                                            Container(
-                                                              width: 100.0,
-                                                              height: 100.0,
-                                                              child: Stack(
-                                                                children: [
-                                                                  ClipRRect(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/qausela-removebg-preview.png',
-                                                                      width:
-                                                                          100.0,
-                                                                      height:
-                                                                          100.0,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                  ),
-                                                                  Align(
-                                                                    alignment:
-                                                                        AlignmentDirectional(
-                                                                            0.0,
-                                                                            0.0),
-                                                                    child: Text(
-                                                                      '${_model.scoreValue?.toString()}%',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Lato',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).primaryBackground,
-                                                                            fontSize:
-                                                                                18.0,
-                                                                            letterSpacing:
-                                                                                0.0,
-                                                                            fontWeight:
-                                                                                FontWeight.w900,
-                                                                            lineHeight:
-                                                                                2.0,
-                                                                          ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          if (_model
-                                                                  .scoreTitle ==
-                                                              'Dá pra melhorar')
-                                                            Container(
-                                                              width: 100.0,
-                                                              height: 100.0,
-                                                              child: Stack(
-                                                                children: [
-                                                                  ClipRRect(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            8.0),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      'assets/images/ruim-removebg-preview.png',
-                                                                      width:
-                                                                          100.0,
-                                                                      height:
-                                                                          100.0,
-                                                                      fit: BoxFit
-                                                                          .cover,
-                                                                    ),
-                                                                  ),
-                                                                  Align(
-                                                                    alignment:
-                                                                        AlignmentDirectional(
-                                                                            0.0,
-                                                                            0.0),
-                                                                    child: Text(
-                                                                      '${_model.scoreValue?.toString()}%',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .override(
-                                                                            fontFamily:
-                                                                                'Lato',
-                                                                            color:
-                                                                                FlutterFlowTheme.of(context).primaryBackground,
-                                                                            fontSize:
-                                                                                18.0,
-                                                                            letterSpacing:
-                                                                                0.0,
-                                                                            fontWeight:
-                                                                                FontWeight.w900,
-                                                                            lineHeight:
-                                                                                2.0,
-                                                                          ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Flexible(
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            valueOrDefault<
-                                                                String>(
-                                                              _model.scoreTitle,
-                                                              '0',
-                                                            ),
-                                                            style: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .titleMedium
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Lato',
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primaryBackground,
-                                                                  letterSpacing:
-                                                                      0.0,
+                                                                  ],
                                                                 ),
-                                                          ),
-                                                          Flexible(
-                                                            child: Text(
+                                                              ),
+                                                            if (_model
+                                                                    .scoreTitle ==
+                                                                'Quase lá')
+                                                              Container(
+                                                                width: 100.0,
+                                                                height: 100.0,
+                                                                child: Stack(
+                                                                  children: [
+                                                                    ClipRRect(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                      child: Image
+                                                                          .asset(
+                                                                        'assets/images/qausela-removebg-preview.png',
+                                                                        width:
+                                                                            100.0,
+                                                                        height:
+                                                                            100.0,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          AlignmentDirectional(
+                                                                              0.0,
+                                                                              0.0),
+                                                                      child:
+                                                                          Text(
+                                                                        '${_model.scoreValue?.toString()}%',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium
+                                                                            .override(
+                                                                              fontFamily: 'Lato',
+                                                                              color: FlutterFlowTheme.of(context).primaryBackground,
+                                                                              fontSize: 18.0,
+                                                                              letterSpacing: 0.0,
+                                                                              fontWeight: FontWeight.w900,
+                                                                              lineHeight: 2.0,
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            if (_model
+                                                                    .scoreTitle ==
+                                                                'Dá pra melhorar')
+                                                              Container(
+                                                                width: 100.0,
+                                                                height: 100.0,
+                                                                child: Stack(
+                                                                  children: [
+                                                                    ClipRRect(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8.0),
+                                                                      child: Image
+                                                                          .asset(
+                                                                        'assets/images/ruim-removebg-preview.png',
+                                                                        width:
+                                                                            100.0,
+                                                                        height:
+                                                                            100.0,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                      ),
+                                                                    ),
+                                                                    Align(
+                                                                      alignment:
+                                                                          AlignmentDirectional(
+                                                                              0.0,
+                                                                              0.0),
+                                                                      child:
+                                                                          Text(
+                                                                        '${_model.scoreValue?.toString()}%',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium
+                                                                            .override(
+                                                                              fontFamily: 'Lato',
+                                                                              color: FlutterFlowTheme.of(context).primaryBackground,
+                                                                              fontSize: 18.0,
+                                                                              letterSpacing: 0.0,
+                                                                              fontWeight: FontWeight.w900,
+                                                                              lineHeight: 2.0,
+                                                                            ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Flexible(
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
                                                               valueOrDefault<
                                                                   String>(
                                                                 _model
-                                                                    .scoreText,
+                                                                    .scoreTitle,
                                                                 '0',
                                                               ),
                                                               style: FlutterFlowTheme
@@ -634,20 +730,44 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                                     color: FlutterFlowTheme.of(
                                                                             context)
                                                                         .primaryBackground,
-                                                                    fontSize:
-                                                                        16.0,
                                                                     letterSpacing:
                                                                         0.0,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal,
                                                                   ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Flexible(
+                                                              child: Text(
+                                                                valueOrDefault<
+                                                                    String>(
+                                                                  _model
+                                                                      .scoreText,
+                                                                  '0',
+                                                                ),
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Lato',
+                                                                      color: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .primaryBackground,
+                                                                      fontSize:
+                                                                          16.0,
+                                                                      letterSpacing:
+                                                                          0.0,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          ].divide(SizedBox(
+                                                              height: 10.0)),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ].divide(
+                                                        SizedBox(width: 20.0)),
+                                                  ),
                                                 ),
                                               ),
                                             if (!_model.isAssessmentSuccess &&
@@ -807,6 +927,8 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                 child: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Column(
                                                       mainAxisSize:
@@ -818,34 +940,24 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      10.0,
-                                                                      0.0,
-                                                                      0.0,
-                                                                      0.0),
-                                                          child:
-                                                              CircularPercentIndicator(
-                                                            percent: 0.8,
-                                                            radius: 30.0,
-                                                            lineWidth: 4.0,
-                                                            animation: true,
-                                                            animateFromLastPercent:
-                                                                true,
-                                                            progressColor:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .primaryBackground,
-                                                            backgroundColor:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .accent4,
-                                                          ).animateOnPageLoad(
-                                                                  animationsMap[
-                                                                      'progressBarOnPageLoadAnimation']!),
-                                                        ),
+                                                        CircularPercentIndicator(
+                                                          percent: 0.8,
+                                                          radius: 30.0,
+                                                          lineWidth: 8.0,
+                                                          animation: true,
+                                                          animateFromLastPercent:
+                                                              true,
+                                                          progressColor:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .primary,
+                                                          backgroundColor:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .accent4,
+                                                        ).animateOnPageLoad(
+                                                            animationsMap[
+                                                                'progressBarOnPageLoadAnimation']!),
                                                       ],
                                                     ),
                                                     Column(
@@ -856,46 +968,40 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                                               .center,
                                                       crossAxisAlignment:
                                                           CrossAxisAlignment
-                                                              .start,
+                                                              .center,
                                                       children: [
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      15.0,
-                                                                      0.0,
-                                                                      0.0,
-                                                                      0.0),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            children: [
-                                                              Text(
-                                                                'Analisando áudio...',
-                                                                style: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .override(
-                                                                      fontFamily:
-                                                                          'Lato',
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primaryBackground,
-                                                                      fontSize:
-                                                                          20.0,
-                                                                      letterSpacing:
-                                                                          0.0,
-                                                                    ),
-                                                              ).animateOnPageLoad(
-                                                                  animationsMap[
-                                                                      'textOnPageLoadAnimation']!),
-                                                            ],
-                                                          ),
+                                                        Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Text(
+                                                              'Analisando áudio...',
+                                                              style: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    fontFamily:
+                                                                        'Playfair Display',
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .primaryBackground,
+                                                                    fontSize:
+                                                                        20.0,
+                                                                    letterSpacing:
+                                                                        0.0,
+                                                                  ),
+                                                            ).animateOnPageLoad(
+                                                                animationsMap[
+                                                                    'textOnPageLoadAnimation']!),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
+                                                  ].divide(
+                                                      SizedBox(width: 20.0)),
                                                 ),
                                               ),
                                           ],
@@ -958,34 +1064,49 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                     logFirebaseEvent(
                                         'ASSESMENT_PAGE_RandomPhraseButton_ON_TAP');
                                     logFirebaseEvent(
+                                        'RandomPhraseButton_widget_animation');
+                                    if (animationsMap[
+                                            'iconOnActionTriggerAnimation1'] !=
+                                        null) {
+                                      animationsMap[
+                                              'iconOnActionTriggerAnimation1']!
+                                          .controller
+                                        ..reset()
+                                        ..repeat();
+                                    }
+                                    logFirebaseEvent(
                                         'RandomPhraseButton_custom_action');
                                     _model.fraseAleatoria = await actions
                                         .obterFraseAleatoriaAction();
                                     logFirebaseEvent(
                                         'RandomPhraseButton_set_form_field');
                                     setState(() {
-                                      _model.textFieldAssesmentController
+                                      _model.textFieldAssesmentTextController
                                           ?.text = valueOrDefault<String>(
                                         _model.fraseAleatoria,
                                         'test',
                                       );
                                     });
                                     logFirebaseEvent(
-                                        'RandomPhraseButton_widget_animation');
-                                    if (animationsMap[
-                                            'iconOnActionTriggerAnimation1'] !=
-                                        null) {
-                                      await animationsMap[
-                                              'iconOnActionTriggerAnimation1']!
-                                          .controller
-                                          .forward();
-                                    }
-                                    logFirebaseEvent(
                                         'RandomPhraseButton_update_page_state');
                                     setState(() {
                                       _model.isAssessmentDone = false;
                                       _model.isTextSaved = false;
                                     });
+                                    logFirebaseEvent(
+                                        'RandomPhraseButton_wait__delay');
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 850));
+                                    logFirebaseEvent(
+                                        'RandomPhraseButton_widget_animation');
+                                    if (animationsMap[
+                                            'iconOnActionTriggerAnimation1'] !=
+                                        null) {
+                                      animationsMap[
+                                              'iconOnActionTriggerAnimation1']!
+                                          .controller
+                                          .reset();
+                                    }
 
                                     setState(() {});
                                   },
@@ -1051,7 +1172,7 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                           if (!((await getPermissionStatus(
                                                   microphonePermission)) &&
                                               !functions.isTextFieldEmpty(_model
-                                                  .textFieldAssesmentController
+                                                  .textFieldAssesmentTextController
                                                   .text))) {
                                             return;
                                           }
@@ -1191,7 +1312,7 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                               "uploadURL":
                                                   _model.uploadedFileUrl,
                                               "text": _model
-                                                  .textFieldAssesmentController
+                                                  .textFieldAssesmentTextController
                                                   .text,
                                               "userId": currentUserUid,
                                             });
@@ -1361,21 +1482,32 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                         if (animationsMap[
                                                 'iconOnActionTriggerAnimation2'] !=
                                             null) {
-                                          setState(
-                                              () => hasIconTriggered2 = true);
-                                          SchedulerBinding.instance
-                                              .addPostFrameCallback((_) async =>
-                                                  await animationsMap[
-                                                          'iconOnActionTriggerAnimation2']!
-                                                      .controller
-                                                      .forward(from: 0.0));
+                                          animationsMap[
+                                                  'iconOnActionTriggerAnimation2']!
+                                              .controller
+                                              .repeat();
                                         }
                                         logFirebaseEvent(
                                             'TTSButton_custom_action');
                                         await actions.talkToMe(
-                                          _model.textFieldAssesmentController
+                                          _model
+                                              .textFieldAssesmentTextController
                                               .text,
                                         );
+                                        logFirebaseEvent(
+                                            'TTSButton_wait__delay');
+                                        await Future.delayed(
+                                            const Duration(milliseconds: 1420));
+                                        logFirebaseEvent(
+                                            'TTSButton_widget_animation');
+                                        if (animationsMap[
+                                                'iconOnActionTriggerAnimation2'] !=
+                                            null) {
+                                          animationsMap[
+                                                  'iconOnActionTriggerAnimation2']!
+                                              .controller
+                                              .stop();
+                                        }
                                       },
                                       child: Icon(
                                         Icons.volume_up,
@@ -1384,9 +1516,9 @@ class _AssesmentWidgetState extends State<AssesmentWidget>
                                         size: 30.0,
                                       ),
                                     ).animateOnActionTrigger(
-                                        animationsMap[
-                                            'iconOnActionTriggerAnimation2']!,
-                                        hasBeenTriggered: hasIconTriggered2),
+                                      animationsMap[
+                                          'iconOnActionTriggerAnimation2']!,
+                                    ),
                                   ],
                                 ),
                               ].divide(SizedBox(width: 50.0)),

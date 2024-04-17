@@ -13,8 +13,8 @@ class ChangePasswordModel extends FlutterFlowModel<ChangePasswordWidget> {
 
   // State field(s) for emailAddress widget.
   FocusNode? emailAddressFocusNode;
-  TextEditingController? emailAddressController;
-  String? Function(BuildContext, String?)? emailAddressControllerValidator;
+  TextEditingController? emailAddressTextController;
+  String? Function(BuildContext, String?)? emailAddressTextControllerValidator;
 
   @override
   void initState(BuildContext context) {}
@@ -22,6 +22,6 @@ class ChangePasswordModel extends FlutterFlowModel<ChangePasswordWidget> {
   @override
   void dispose() {
     emailAddressFocusNode?.dispose();
-    emailAddressController?.dispose();
+    emailAddressTextController?.dispose();
   }
 }
